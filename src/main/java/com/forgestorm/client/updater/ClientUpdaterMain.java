@@ -32,7 +32,7 @@ public class ClientUpdaterMain {
         for (String arg : args) {
             if (arg.equalsIgnoreCase("ideRun")){
                 ideRun = true;
-                return;
+                break;
             }
         }
 
