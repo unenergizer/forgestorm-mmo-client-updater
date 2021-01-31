@@ -1,31 +1,13 @@
 package com.forgestorm.client.updater;
 
 public enum ProgressState {
-    REQUESTING_INFORMATION {
+    REQUEST_INFORMATION {
         @Override
         public ProgressState nextState() {
-            return PARSING_FILE_TREE;
+            return DOWNLOAD_FILES;
         }
     },
-    PARSING_FILE_TREE {
-        @Override
-        public ProgressState nextState() {
-            return CHECKING_FILE_HASH;
-        }
-    },
-    CHECKING_FILE_HASH {
-        @Override
-        public ProgressState nextState() {
-            return PREPARING_DOWNLOAD_STATE;
-        }
-    },
-    PREPARING_DOWNLOAD_STATE {
-        @Override
-        public ProgressState nextState() {
-            return DOWNLOADING_FILES;
-        }
-    },
-    DOWNLOADING_FILES {
+    DOWNLOAD_FILES {
         @Override
         public ProgressState nextState() {
             return FINISH_UPDATE;

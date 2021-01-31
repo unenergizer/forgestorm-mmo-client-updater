@@ -6,18 +6,20 @@ import lombok.Getter;
 public class ClientUpdaterMain {
 
     private static ClientUpdaterMain instance = null;
+    public static boolean ideRun = false;
 
     private UserInterface userInterface;
-    private Network network;
-    private ProgressTracker progressTracker;
+    private FileDownloader network;
+    private StateMachine stateMachine;
+
 
     private ClientUpdaterMain() {
     }
 
     public void start() {
         userInterface = new UserInterface();
-        network = new Network();
-        progressTracker = new ProgressTracker();
+        network = new FileDownloader();
+        stateMachine = new StateMachine();
     }
 
     public static ClientUpdaterMain getInstance() {
@@ -26,6 +28,11 @@ public class ClientUpdaterMain {
     }
 
     public static void main(String[] args) {
+
+        for (String arg : args) {
+            if (arg.equalsIgnoreCase("ideRun")) ideRun = true;
+        }
+
         ClientUpdaterMain.getInstance().start();
     }
 

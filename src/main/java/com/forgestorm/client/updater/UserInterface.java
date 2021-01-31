@@ -49,7 +49,11 @@ public class UserInterface {
     }
 
     public void printError(Exception exception) {
+        printError(exception.toString());
+    }
+
+    public void printError(String error) {
         updateProgressState(ProgressState.ERROR);
-        progressInfoTextArea.append(exception + "\n");
+        progressInfoTextArea.append(error + "\n");
     }
 }
