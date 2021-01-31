@@ -25,6 +25,7 @@ public class UserInterface {
         jProgressBar.setIndeterminate(true);
 
         // File progress description area
+        progressInfoTextArea.setEditable(false);
         JScrollPane jScrollPane = new JScrollPane(progressInfoTextArea);
         DefaultCaret caret = (DefaultCaret) progressInfoTextArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -33,6 +34,8 @@ public class UserInterface {
         frame.getContentPane().add(BorderLayout.NORTH, jPanel);
         frame.getContentPane().add(BorderLayout.CENTER, jScrollPane);
         frame.setVisible(true);
+
+        updateProgressInfo("Beginning update process...");
     }
 
     public void updateProgressState(ProgressState progressState) {

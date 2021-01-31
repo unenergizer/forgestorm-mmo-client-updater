@@ -61,6 +61,8 @@ public class StateMachine {
     }
 
     private void finishUpdate() {
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("Update finished! Starting game client...");
+
         // Open game client
         try {
             if ((new File("RetroMMO.jar")).exists()) {

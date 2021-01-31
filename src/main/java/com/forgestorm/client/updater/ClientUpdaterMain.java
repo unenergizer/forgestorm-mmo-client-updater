@@ -30,7 +30,10 @@ public class ClientUpdaterMain {
     public static void main(String[] args) {
 
         for (String arg : args) {
-            if (arg.equalsIgnoreCase("ideRun")) ideRun = true;
+            if (arg.equalsIgnoreCase("ideRun")){
+                ideRun = true;
+                return;
+            }
         }
 
         ClientUpdaterMain.getInstance().start();

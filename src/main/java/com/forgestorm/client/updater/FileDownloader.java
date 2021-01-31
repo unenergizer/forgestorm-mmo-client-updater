@@ -33,7 +33,7 @@ public class FileDownloader {
             URL url = new URL("https://forgestorm.com/test/" + file);
             HttpURLConnection httpConnection = (HttpURLConnection) (url.openConnection());
 
-            String string = " - " + file + " Size: " + httpConnection.getContentLength();
+            String string = " - " + file + " Size: " + bytesIntoHumanReadable(httpConnection.getContentLength());
             ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(string);
 
             BufferedInputStream inputStream = new BufferedInputStream(httpConnection.getInputStream());
@@ -52,6 +52,27 @@ public class FileDownloader {
             inputStream.close();
         } catch (IOException e) {
             ClientUpdaterMain.getInstance().getUserInterface().printError(e);
+        }
+    }
+
+    private static String bytesIntoHumanReadable(long bytes) {
+        final long kilobyte = 1024;
+        final long megabyte = kilobyte * 1024;
+        final long gigabyte = megabyte * 1024;
+        final long terabyte = gigabyte * 1024;
+
+        if ((bytes >= 0) && (bytes < kilobyte)) {
+            return bytes + " B";
+        } else if ((bytes >= kilobyte) && (bytes < megabyte)) {
+            return (bytes / kilobyte) + " KB";
+        } else if ((bytes >= megabyte) && (bytes < gigabyte)) {
+            return (bytes / megabyte) + " MB";
+        } else if ((bytes >= gigabyte) && (bytes < terabyte)) {
+            return (bytes / gigabyte) + " GB";
+        } else if (bytes >= terabyte) {
+            return (bytes / terabyte) + " TB";
+        } else {
+            return bytes + " Bytes";
         }
     }
 }
