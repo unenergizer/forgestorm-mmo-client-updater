@@ -12,7 +12,6 @@ public class ClientUpdaterMain {
     private FileDownloader network;
     private StateMachine stateMachine;
 
-
     private ClientUpdaterMain() {
     }
 
@@ -30,7 +29,7 @@ public class ClientUpdaterMain {
     public static void main(String[] args) {
 
         for (String arg : args) {
-            if (arg.equalsIgnoreCase("ideRun")){
+            if (arg.equalsIgnoreCase("ideRun")) {
                 ideRun = true;
                 break;
             }

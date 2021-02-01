@@ -58,5 +58,9 @@ public class UserInterface {
     public void printError(String error) {
         updateProgressState(ProgressState.ERROR);
         progressInfoTextArea.append(error + "\n");
+        progressInfoTextArea.append("\n");
+        progressInfoTextArea.append("Please report this bug. Copy and paste the entire output here: \n");
+        progressInfoTextArea.append("https://forgestorm.com/forums/bug-reports/");
+        progressInfoTextArea.append("\n");
     }
 }
