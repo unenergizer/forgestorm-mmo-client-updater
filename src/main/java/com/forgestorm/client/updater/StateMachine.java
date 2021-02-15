@@ -1,15 +1,21 @@
 package com.forgestorm.client.updater;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class StateMachine {
 
-    private final List<String> fileList = new ArrayList<>();
+    private static final String DOTS = "*************************************";
+
+    private final List<FileData> fileList = new ArrayList<>();
 
     private ProgressState progressState = ProgressState.REQUEST_INFORMATION;
 
@@ -22,6 +28,9 @@ public class StateMachine {
         switch (progressState) {
             case REQUEST_INFORMATION:
                 requestInformation();
+                break;
+            case VERIFY_FILES:
+                checkFileIntegrity();
                 break;
             case DOWNLOAD_FILES:
                 downloadFiles();
@@ -37,31 +46,57 @@ public class StateMachine {
     }
 
     private void requestInformation() {
-        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("Parsing File Directories:");
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("");
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(DOTS);
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("       Parsing File Directories");
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(DOTS);
         try {
-            URL url = new URL("https://forgestorm.com/test/files.txt");
+            URL url = new URL(ClientUpdaterMain.FILE_URL + "files.txt");
             Scanner scanner = new Scanner(url.openStream());
             while (scanner.hasNext()) {
-                String file = scanner.next();
-                fileList.add(file);
-                ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(" - " + file);
+                String downloadURL = scanner.next();
+                String md5Hash = scanner.next();
+                fileList.add(new FileData(downloadURL, md5Hash));
+                ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(" - " + downloadURL);
             }
         } catch (IOException e) {
             ClientUpdaterMain.getInstance().getUserInterface().printError(e);
         }
     }
 
-    private void downloadFiles() {
-        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("Downloading Game Files:");
-        for (int i = 0; i < fileList.size(); i++) {
-            FileDownloader network = ClientUpdaterMain.getInstance().getNetwork();
-            network.downloadFile(fileList.get(i), i, fileList.size());
+    private void checkFileIntegrity() {
+        final File filePath = ClientUpdaterMain.getInstance().getFileDownloader().getJarFilePath();
 
+        for (FileData fileData : fileList) {
+            File file = new File(filePath + File.separator + fileData.getDownloadURL());
+
+            if (!file.exists()) continue;
+            try {
+                String hex = ChecksumUtil.generate(file);
+                if (hex.equalsIgnoreCase(fileData.getMd5Hash())) fileData.setMd5Matched(true);
+            } catch (NoSuchAlgorithmException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void downloadFiles() {
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("");
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(DOTS);
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("         Downloading Game Files");
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(DOTS);
+        for (int i = 0; i < fileList.size(); i++) {
+            FileDownloader network = ClientUpdaterMain.getInstance().getFileDownloader();
+            network.downloadFile(fileList.get(i), i, fileList.size());
         }
     }
 
     private void finishUpdate() {
-        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("Update finished! Starting game client...");
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("");
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(DOTS);
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("               Update Finished");
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(DOTS);
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("Starting game client...");
 
         // Open game client
         try {
@@ -81,5 +116,23 @@ public class StateMachine {
 
         // Close the updater (unless ran from IDE)
         if (!ClientUpdaterMain.ideRun) System.exit(0);
+    }
+
+    @Getter
+    static class FileData {
+        private final String downloadURL;
+        private final String md5Hash;
+
+        /**
+         * If this value is set to true, the file
+         * will NOT be downloaded.
+         */
+        @Setter
+        private boolean md5Matched = false;
+
+        FileData(String downloadURL, String md5Hash) {
+            this.downloadURL = downloadURL;
+            this.md5Hash = md5Hash;
+        }
     }
 }

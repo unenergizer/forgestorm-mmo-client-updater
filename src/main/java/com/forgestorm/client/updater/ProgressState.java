@@ -4,6 +4,12 @@ public enum ProgressState {
     REQUEST_INFORMATION {
         @Override
         public ProgressState nextState() {
+            return VERIFY_FILES;
+        }
+    },
+    VERIFY_FILES {
+        @Override
+        public ProgressState nextState() {
             return DOWNLOAD_FILES;
         }
     },

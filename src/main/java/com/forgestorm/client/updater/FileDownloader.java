@@ -1,5 +1,7 @@
 package com.forgestorm.client.updater;
 
+import lombok.Getter;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
@@ -9,6 +11,7 @@ public class FileDownloader {
 
     private static final int BUFFER_SIZE = 1024;
 
+    @Getter
     private File jarFilePath;
 
     public FileDownloader() {
@@ -19,8 +22,17 @@ public class FileDownloader {
         }
     }
 
-    public void downloadFile(String file, int index, int max) {
-        File path = new File(jarFilePath + File.separator + file);
+    public void downloadFile(StateMachine.FileData file, int index, int max) {
+        String fileInfoLine = " - " + file.getDownloadURL();
+        final int currentProgress = (int) ((((double) index + 1) / ((double) max)) * 100);
+
+        if (file.isMd5Matched()) {
+            ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(fileInfoLine + " is up to date.");
+            ClientUpdaterMain.getInstance().getUserInterface().updateProgressBar(currentProgress);
+            return;
+        }
+
+        File path = new File(jarFilePath + File.separator + file.getDownloadURL());
         File directory = path.getParentFile();
 
         if (!directory.exists()) {
@@ -30,10 +42,10 @@ public class FileDownloader {
         }
 
         try {
-            URL url = new URL("https://forgestorm.com/test/" + file);
+            URL url = new URL(ClientUpdaterMain.FILE_URL + file.getDownloadURL());
             HttpURLConnection httpConnection = (HttpURLConnection) (url.openConnection());
 
-            String string = " - " + file + " Size: " + bytesIntoHumanReadable(httpConnection.getContentLength());
+            String string = fileInfoLine + " : Size: " + bytesIntoHumanReadable(httpConnection.getContentLength());
             ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(string);
 
             BufferedInputStream inputStream = new BufferedInputStream(httpConnection.getInputStream());
@@ -44,7 +56,6 @@ public class FileDownloader {
             int x;
             while ((x = inputStream.read(data, 0, BUFFER_SIZE)) >= 0) {
                 // calculate and update progress
-                final int currentProgress = (int) ((((double) index + 1) / ((double) max)) * 100);
                 ClientUpdaterMain.getInstance().getUserInterface().updateProgressBar(currentProgress);
                 bufferedOutputStream.write(data, 0, x);
             }

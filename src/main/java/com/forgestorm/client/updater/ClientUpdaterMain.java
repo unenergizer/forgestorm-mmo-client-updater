@@ -5,11 +5,13 @@ import lombok.Getter;
 @Getter
 public class ClientUpdaterMain {
 
+    public static final String FILE_URL = "https://forgestorm.com/client_files/";
+
     private static ClientUpdaterMain instance = null;
     public static boolean ideRun = false;
 
     private UserInterface userInterface;
-    private FileDownloader network;
+    private FileDownloader fileDownloader;
     private StateMachine stateMachine;
 
     private ClientUpdaterMain() {
@@ -17,7 +19,7 @@ public class ClientUpdaterMain {
 
     public void start() {
         userInterface = new UserInterface();
-        network = new FileDownloader();
+        fileDownloader = new FileDownloader();
         stateMachine = new StateMachine();
     }
 
