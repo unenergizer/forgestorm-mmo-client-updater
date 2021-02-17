@@ -28,7 +28,7 @@ public class FileDownloader {
 
         if (file.isMd5Matched()) {
             ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(fileInfoLine + " is up to date.");
-            ClientUpdaterMain.getInstance().getUserInterface().updateProgressBar(currentProgress);
+            ClientUpdaterMain.getInstance().getUserInterface().updateOverallProgressBar(currentProgress);
             return;
         }
 
@@ -44,8 +44,9 @@ public class FileDownloader {
         try {
             URL url = new URL(ClientUpdaterMain.FILE_URL + file.getDownloadURL());
             HttpURLConnection httpConnection = (HttpURLConnection) (url.openConnection());
+            long completeFileSize = httpConnection.getContentLength();
 
-            String string = fileInfoLine + " : Size: " + bytesIntoHumanReadable(httpConnection.getContentLength());
+            String string = fileInfoLine + " : Size: " + bytesIntoHumanReadable(completeFileSize);
             ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(string);
 
             BufferedInputStream inputStream = new BufferedInputStream(httpConnection.getInputStream());
@@ -53,11 +54,16 @@ public class FileDownloader {
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream, BUFFER_SIZE);
 
             byte[] data = new byte[BUFFER_SIZE];
-            int x;
-            while ((x = inputStream.read(data, 0, BUFFER_SIZE)) >= 0) {
+            long downloadedFileSize = 0;
+            int lastReadCount;
+            while ((lastReadCount = inputStream.read(data, 0, BUFFER_SIZE)) >= 0) {
+                downloadedFileSize += lastReadCount;
+                bufferedOutputStream.write(data, 0, lastReadCount);
+
                 // calculate and update progress
-                ClientUpdaterMain.getInstance().getUserInterface().updateProgressBar(currentProgress);
-                bufferedOutputStream.write(data, 0, x);
+                final int fileProgress = (int) ((((double) downloadedFileSize) / ((double) completeFileSize)) * 100d);
+                ClientUpdaterMain.getInstance().getUserInterface().updateOverallProgressBar(currentProgress);
+                ClientUpdaterMain.getInstance().getUserInterface().updateFileProgressBar(fileProgress);
             }
             bufferedOutputStream.close();
             inputStream.close();

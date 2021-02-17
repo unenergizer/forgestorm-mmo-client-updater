@@ -19,6 +19,9 @@ public class StateMachine {
 
     private ProgressState progressState = ProgressState.REQUEST_INFORMATION;
 
+    @Setter
+    private boolean errorHappened = false;
+
     public StateMachine() {
         trackProgress();
     }
@@ -48,7 +51,7 @@ public class StateMachine {
     private void requestInformation() {
         ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("");
         ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(DOTS);
-        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("       Parsing File Directories");
+        ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo("             Parsing File Lists");
         ClientUpdaterMain.getInstance().getUserInterface().updateProgressInfo(DOTS);
         try {
             URL url = new URL(ClientUpdaterMain.FILE_URL + "files.txt");
@@ -115,7 +118,7 @@ public class StateMachine {
         }
 
         // Close the updater (unless ran from IDE)
-        if (!ClientUpdaterMain.ideRun) System.exit(0);
+        if (!ClientUpdaterMain.ideRun && !errorHappened) System.exit(0);
     }
 
     @Getter

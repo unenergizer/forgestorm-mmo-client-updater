@@ -7,7 +7,8 @@ import java.awt.*;
 public class UserInterface {
 
     private final JLabel downloadStateLabel = new JLabel();
-    private final JProgressBar jProgressBar = new JProgressBar();
+    private final JProgressBar overallProgress = new JProgressBar();
+    private final JProgressBar fileProgress = new JProgressBar();
     private final JTextArea progressInfoTextArea = new JTextArea();
 
     public UserInterface() {
@@ -18,11 +19,22 @@ public class UserInterface {
         frame.setLocationRelativeTo(null); // Center window
 
         // Progress Area
-        JPanel jPanel = new JPanel();
-        jProgressBar.setStringPainted(true);
-        jPanel.add(downloadStateLabel);
-        jPanel.add(jProgressBar);
-        jProgressBar.setIndeterminate(true);
+        JPanel mainProgressPanel = new JPanel();
+        overallProgress.setStringPainted(true);
+        mainProgressPanel.add(downloadStateLabel);
+        mainProgressPanel.add(overallProgress);
+        overallProgress.setIndeterminate(true);
+
+        JPanel fileProgressPanel = new JPanel();
+        fileProgress.setStringPainted(true);
+        fileProgressPanel.add(new JLabel("File Progress:"));
+        fileProgressPanel.add(fileProgress);
+        fileProgress.setIndeterminate(true);
+
+        JPanel progressContainer = new JPanel();
+        progressContainer.setLayout(new BoxLayout(progressContainer, BoxLayout.PAGE_AXIS));
+        progressContainer.add(BorderLayout.NORTH, mainProgressPanel);
+        progressContainer.add(BorderLayout.CENTER, fileProgressPanel);
 
         // File progress description area
         progressInfoTextArea.setEditable(false);
@@ -31,7 +43,7 @@ public class UserInterface {
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         // Add everything to the window
-        frame.getContentPane().add(BorderLayout.NORTH, jPanel);
+        frame.getContentPane().add(BorderLayout.NORTH, progressContainer);
         frame.getContentPane().add(BorderLayout.CENTER, jScrollPane);
         frame.setVisible(true);
 
@@ -46,9 +58,14 @@ public class UserInterface {
         progressInfoTextArea.append(progressInfo + "\n");
     }
 
-    public void updateProgressBar(int progress) {
-        jProgressBar.setIndeterminate(false);
-        jProgressBar.setValue(progress);
+    public void updateOverallProgressBar(int progress) {
+        overallProgress.setIndeterminate(false);
+        overallProgress.setValue(progress);
+    }
+
+    public void updateFileProgressBar(int progress) {
+        fileProgress.setIndeterminate(false);
+        fileProgress.setValue(progress);
     }
 
     public void printError(Exception exception) {
@@ -56,6 +73,7 @@ public class UserInterface {
     }
 
     public void printError(String error) {
+        ClientUpdaterMain.getInstance().getStateMachine().setErrorHappened(true);
         updateProgressState(ProgressState.ERROR);
         progressInfoTextArea.append(error + "\n");
         progressInfoTextArea.append("\n");
