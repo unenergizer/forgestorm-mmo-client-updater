@@ -10,23 +10,19 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StateMachine {
 
     private static final String DOTS = "*************************************";
 
+    @Getter
+    private final AtomicBoolean errorHappened = new AtomicBoolean(false);
     private final List<FileData> fileList = new ArrayList<>();
 
     private ProgressState progressState = ProgressState.REQUEST_INFORMATION;
 
-    @Setter
-    private boolean errorHappened = false;
-
-    public StateMachine() {
-        trackProgress();
-    }
-
-    private void trackProgress() {
+    public void trackProgress() {
         ClientUpdaterMain.getInstance().getUserInterface().updateProgressState(progressState);
         switch (progressState) {
             case REQUEST_INFORMATION:
@@ -113,12 +109,12 @@ public class StateMachine {
                     Runtime.getRuntime().exec("java -jar ../MacOS/RetroMMO");
                 }
             }
-        } catch (IOException e) {
-            ClientUpdaterMain.getInstance().getUserInterface().printError(e);
+        } catch (IOException | NullPointerException e) {
+            ClientUpdaterMain.getInstance().getUserInterface().printError("Can not find the game-client executable. Restart the game manually to start playing.");
         }
 
         // Close the updater (unless ran from IDE)
-        if (!ClientUpdaterMain.ideRun && !errorHappened) System.exit(0);
+        if (!ClientUpdaterMain.ideRun && !errorHappened.get()) System.exit(0);
     }
 
     @Getter

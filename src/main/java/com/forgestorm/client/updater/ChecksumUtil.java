@@ -1,11 +1,14 @@
 package com.forgestorm.client.updater;
 
-import javax.xml.bind.DatatypeConverter;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import javax.xml.bind.DatatypeConverter;
+
 
 public class ChecksumUtil {
 
@@ -23,5 +26,4 @@ public class ChecksumUtil {
 
         return DatatypeConverter.printHexBinary(hash).toUpperCase();
     }
-
 }

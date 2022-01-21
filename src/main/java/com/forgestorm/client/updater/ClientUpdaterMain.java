@@ -10,17 +10,16 @@ public class ClientUpdaterMain {
     private static ClientUpdaterMain instance = null;
     public static boolean ideRun = false;
 
-    private UserInterface userInterface;
-    private FileDownloader fileDownloader;
-    private StateMachine stateMachine;
+    private final UserInterface userInterface = new UserInterface();
+    private final FileDownloader fileDownloader = new FileDownloader();
+    private final StateMachine stateMachine = new StateMachine();
 
     private ClientUpdaterMain() {
     }
 
     public void start() {
-        userInterface = new UserInterface();
-        fileDownloader = new FileDownloader();
-        stateMachine = new StateMachine();
+        userInterface.buildUserInterface();
+        stateMachine.trackProgress();
     }
 
     public static ClientUpdaterMain getInstance() {
@@ -39,5 +38,4 @@ public class ClientUpdaterMain {
 
         ClientUpdaterMain.getInstance().start();
     }
-
 }

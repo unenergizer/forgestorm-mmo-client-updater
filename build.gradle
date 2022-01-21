@@ -11,8 +11,10 @@ repositories {
 
 dependencies {
     // JAX-B dependencies for JDK 9+
-    implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
-    implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
+    compile "javax.xml.bind:jaxb-api:2.3.0"
+    compile "com.sun.xml.bind:jaxb-impl:2.3.0"
+    compile "org.glassfish.jaxb:jaxb-runtime:2.3.0"
+    compile "javax.activation:activation:1.1.1"
 
     compileOnly 'org.projectlombok:lombok:1.18.16'
     annotationProcessor 'org.projectlombok:lombok:1.18.16'

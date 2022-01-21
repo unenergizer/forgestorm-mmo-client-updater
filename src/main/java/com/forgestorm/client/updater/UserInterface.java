@@ -3,6 +3,7 @@ package com.forgestorm.client.updater;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserInterface {
 
@@ -11,7 +12,7 @@ public class UserInterface {
     private final JProgressBar fileProgress = new JProgressBar();
     private final JTextArea progressInfoTextArea = new JTextArea();
 
-    public UserInterface() {
+    public void buildUserInterface() {
         JFrame frame = new JFrame("RetroMMO Updater");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 300);
@@ -73,7 +74,7 @@ public class UserInterface {
     }
 
     public void printError(String error) {
-        ClientUpdaterMain.getInstance().getStateMachine().setErrorHappened(true);
+        ClientUpdaterMain.getInstance().getStateMachine().getErrorHappened().set(true);
         updateProgressState(ProgressState.ERROR);
         progressInfoTextArea.append(error + "\n");
         progressInfoTextArea.append("\n");
